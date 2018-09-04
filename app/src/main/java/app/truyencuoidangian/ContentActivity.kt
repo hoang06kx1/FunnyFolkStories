@@ -18,6 +18,11 @@ class ContentActivity : AppCompatActivity() {
         tv_content.text = story.content
         ic_favorite.setImageResource(if (story.favorited == 1) R.drawable.ic_favorite else R.drawable.ic_favorite_grey)
         tv_time.text = getTimeString(story.lastView)
+        ic_favorite.setOnClickListener {
+            story.favorited = if (story.favorited == 1) 0 else 1
+            ic_favorite.setImageResource(if (story.favorited == 1) R.drawable.ic_favorite else R.drawable.ic_favorite_grey)
+            StoryDB.getInstance(this)!!.StoryDao().updateStory(story)
+        }
     }
 
     fun getTimeString(timestamp: Long?): String {
