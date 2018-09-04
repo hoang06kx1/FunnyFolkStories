@@ -1,8 +1,7 @@
 apply plugin: 'com.android.application'
-
 apply plugin: 'kotlin-android'
-
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 27
@@ -28,6 +27,7 @@ dependencies {
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.android.support:support-v4:27.1.1'
     implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:design:27.1.1'
     implementation 'com.android.support:recyclerview-v7:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     testImplementation 'junit:junit:4.12'
@@ -39,4 +39,6 @@ dependencies {
     kapt "android.arch.persistence.room:compiler:$room_version" // use kapt for Kotlin
     implementation "android.arch.persistence.room:rxjava2:$room_version"
     implementation "com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.27"
+    implementation 'com.github.humazed:RoomAsset:1.0.3'
+    implementation 'com.github.daolq3012:AssetSQLiteOpenHelper:1.0'
 }
