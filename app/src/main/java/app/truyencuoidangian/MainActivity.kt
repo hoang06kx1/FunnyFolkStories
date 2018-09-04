@@ -30,9 +30,13 @@ class MainActivity : AppCompatActivity() {
         initStories()
 
         storiesAdapter.onItemClickListener = BaseQuickAdapter.OnItemClickListener { _, _, position ->
-            val storyId = storiesAdapter.data[position].id
+            val story = storiesAdapter.data[position]
+            if (story.lastView == null) {
+                story.lastView = System.currentTimeMillis()
+                StoryDB.getInstance(this)!!.StoryDao().updateStory(story)
+            }
             val i = Intent(this, ContentActivity::class.java)
-            i.putExtra("STORY_ID", storyId)
+            i.putExtra("STORY_ID", story.id)
             startActivity(i)
         }
         favoritedStoriesAdapter.onItemClickListener = storiesAdapter.onItemClickListener
