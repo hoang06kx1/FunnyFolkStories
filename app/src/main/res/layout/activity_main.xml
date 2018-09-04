@@ -14,7 +14,7 @@
         android:layout_height="?android:attr/actionBarSize"
         android:background="@color/colorPrimary"
         android:elevation="2dp"
-        app:title="@string/toolbar_title"
+        app:title="@string/toolbar_main_title"
         app:titleTextColor="@android:color/white"/>
 
     <android.support.design.widget.TabLayout

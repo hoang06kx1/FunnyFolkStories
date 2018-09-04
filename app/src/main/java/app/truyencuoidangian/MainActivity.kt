@@ -1,5 +1,6 @@
 package app.truyencuoidangian
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.view.PagerAdapter
 import android.support.v7.app.AppCompatActivity
@@ -27,6 +28,15 @@ class MainActivity : AppCompatActivity() {
         vp.adapter = tabAdapter
         tabs.setupWithViewPager(vp)
         initStories()
+
+        storiesAdapter.onItemClickListener = BaseQuickAdapter.OnItemClickListener { _, _, position ->
+            val storyId = storiesAdapter.data[position].id
+            val i = Intent(this, ContentActivity::class.java)
+            i.putExtra("STORY_ID", storyId)
+            startActivity(i)
+        }
+
+        favoritedStoriesAdapter.onItemClickListener = storiesAdapter.onItemClickListener
     }
 
     private fun initStories() {

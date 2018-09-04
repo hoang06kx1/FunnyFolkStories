@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:elevation="2dp"
+        app:title="@string/toolbar_content_title"
+        app:titleTextColor="@android:color/white"/>
+
+    <ScrollView
+        android:scrollbarStyle="outsideOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:padding="@dimen/padding_screen"
+        tools:context=".ContentActivity">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:gravity="center"
+                android:textColor="@color/text_default"
+                android:textSize="@dimen/font_large"
+                tools:text="Nằm đó mà xem"/>
+
+            <TextView
+                android:id="@+id/tv_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/text_search"
+                android:textSize="@dimen/font_small"
+                android:textStyle="italic"
+                tools:text="Đã xem lúc 18:18 ngày 30/08/2018"/>
+
+            <ImageView
+                android:id="@+id/ic_favorite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="12dp"
+                android:src="@drawable/ic_favorite_grey"/>
+
+            <com.uncopt.android.widget.text.justify.JustifiedTextView
+                android:id="@+id/tv_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:textColor="@color/text_default"
+                android:textSize="@dimen/font_default"
+                tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus sapien ligula, euismod eu magna id, dapibus venenatis lorem. Integer et molestie ante, et rutrum justo. Proin ac eleifend enim. Maecenas laoreet fermentum urna, gravida maximus massa varius semper. Nulla venenatis, massa a blandit feugiat, massa turpis vehicula justo, eu lacinia eros elit sed neque. Nulla facilisi. Quisque scelerisque nisl ac tortor ullamcorper pellentesque. Sed aliquam ultrices turpis, nec tempus tellus semper et. Proin tincidunt rhoncus justo eu consectetur. Morbi hendrerit dictum augue ut cursus. Vestibulum sit amet justo dui. "/>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

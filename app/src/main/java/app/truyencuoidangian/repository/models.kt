@@ -25,6 +25,9 @@ interface StoryDao {
     @Query("SELECT * FROM stories")
     fun getAll(): Flowable<List<Story>>
 
+    @Query("SELECT * FROM stories WHERE id= :id")
+    fun getStory(id: Int): Story
+
     @Query("SELECT * FROM stories WHERE favorited = 1")
     fun getFavoriteStories(): Flowable<List<Story>>
 

@@ -15,7 +15,7 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:textColor="@color/text_default"
-        android:textSize="@dimen/font_large"
+        android:textSize="@dimen/font_default"
         tools:text="Truyện thứ nhất "/>
 
     <View
