@@ -3,7 +3,6 @@ package app.truyencuoidangian.repository
 import android.arch.persistence.room.*
 import android.content.Context
 import com.fstyle.library.helper.AssetSQLiteOpenHelperFactory
-import com.huma.room_for_asset.RoomAsset
 import io.reactivex.Flowable
 
 @Entity(tableName = "stories")

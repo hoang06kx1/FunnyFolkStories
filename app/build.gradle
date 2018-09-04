@@ -38,7 +38,6 @@ dependencies {
     implementation "android.arch.persistence.room:runtime:$room_version"
     kapt "android.arch.persistence.room:compiler:$room_version" // use kapt for Kotlin
     implementation "android.arch.persistence.room:rxjava2:$room_version"
-    implementation "com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.27"
-    implementation 'com.github.humazed:RoomAsset:1.0.3'
+    implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.27'
     implementation 'com.github.daolq3012:AssetSQLiteOpenHelper:1.0'
 }

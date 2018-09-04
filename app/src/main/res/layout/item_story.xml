@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="2dp"
-    android:padding="@dimen/padding_default">
+    android:background="@android:color/white"
+    android:padding="12dp">
 
     <TextView
         android:id="@+id/tv_name"
@@ -14,7 +15,7 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:textColor="@color/text_default"
-        android:textSize="@dimen/font_default"
+        android:textSize="@dimen/font_large"
         tools:text="Truyện thứ nhất "/>
 
     <View
