@@ -23,6 +23,9 @@ interface StoryDao {
     @Query("SELECT * from stories")
     fun getAll(): List<Story>
 
+    @Query("SELECT * from stories where favorited = 1")
+    fun getFavoriteStories(): List<Story>
+
     @Query("SELECT * from stories where read = 1")
     fun getReadStories(): List<Story>
 

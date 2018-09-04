@@ -3,4 +3,5 @@
     <dimen name="padding_default">8dp</dimen>
     <dimen name="padding_screen">16dp</dimen>
     <dimen name="font_default">16sp</dimen>
+    <dimen name="icon_default">24dp</dimen>
 </resources>

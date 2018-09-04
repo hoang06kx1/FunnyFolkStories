@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#185f1d</color>
     <color name="colorAccent">#30be3b</color>
     <color name="bg_search">#e6e6e8</color>
+    <color name="bg_recycler">#f8f8f8</color>
     <color name="text_search">#8b8a8f</color>
     <color name="text_tab">#c4c4c4</color>
     <color name="text_default">#010101</color>

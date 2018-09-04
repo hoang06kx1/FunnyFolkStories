@@ -13,15 +13,20 @@
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize"
         android:background="@color/colorPrimary"
+        android:elevation="2dp"
         app:title="@string/toolbar_title"
-        app:titleTextColor="@android:color/white"
-        android:elevation="2dp" />
+        app:titleTextColor="@android:color/white"/>
 
-    <android.support.v7.RecyclerView
-        android:id="@+id/rv"
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tabs"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="48dp"
+        android:background="@android:color/white"
+        />
 
-    </android.support.v7.RecyclerView>
+    <android.support.v4.view.ViewPager
+        android:id="@+id/vp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </LinearLayout>
