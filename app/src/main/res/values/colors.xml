@@ -6,7 +6,7 @@
     <color name="bg_search">#e6e6e8</color>
     <color name="text_search">#8b8a8f</color>
     <color name="text_tab">#c4c4c4</color>
-    <color name="text_default">#c4c4c4</color>
+    <color name="text_default">#010101</color>
     <color name="share_icon">#ff4f1e</color>
     <color name="bg_popup_title">#f3f3f3</color>
 </resources>
