@@ -35,8 +35,17 @@ class MainActivity : AppCompatActivity() {
             i.putExtra("STORY_ID", storyId)
             startActivity(i)
         }
-
         favoritedStoriesAdapter.onItemClickListener = storiesAdapter.onItemClickListener
+
+        storiesAdapter.onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
+            if (view.id == R.id.ic_favorite) {
+                val story = storiesAdapter.data[position]
+                story.favorited = if (story.favorited == 1) 0 else 1
+                StoryDB.getInstance(this)!!.StoryDao().updateStory(story)
+                initStories()
+            }
+        }
+        favoritedStoriesAdapter.onItemChildClickListener = storiesAdapter.onItemChildClickListener
     }
 
     private fun initStories() {
@@ -44,13 +53,13 @@ class MainActivity : AppCompatActivity() {
             getAll().subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
-                        storiesAdapter.addData(it)
+                        storiesAdapter.setNewData(it)
                     }, Throwable::printStackTrace)
 
             getFavoriteStories().subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
-                        favoritedStoriesAdapter.addData(it)
+                        favoritedStoriesAdapter.setNewData(it)
                     }, Throwable::printStackTrace)
         }
     }

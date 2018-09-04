@@ -42,6 +42,9 @@ interface StoryDao {
 
     @Query("SELECT * from stories where category = 2")
     fun getFolkStories(): Flowable<List<Story>>
+
+    @Update
+    fun updateStory(story: Story)
 }
 
 @Database(entities = [Story::class], version = 1)
