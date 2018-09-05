@@ -21,6 +21,13 @@ class MainActivity : AppCompatActivity() {
     private val tabAdapter = TabAdapter()
     private val storiesAdapter = StoryAdapter(R.layout.item_story, ArrayList())
     private val favoritedStoriesAdapter = StoryAdapter(R.layout.item_story, ArrayList())
+    val filterReadStories = { t: Story -> t.read != null }
+    val filterUnReadStories = { t: Story -> t.read == null }
+    val filterAllStories = { t: Story -> true }
+    val filterObsceneStories = { t: Story -> t.category == 1 }
+    val filterFolkStories = { t: Story -> t.category == 2 }
+    var searchKey: String = ""
+    var currentFilter = filterAllStories
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,6 +63,7 @@ class MainActivity : AppCompatActivity() {
         StoryDB.getInstance(this)!!.StoryDao().apply {
             getAll().subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .map { it.filter(currentFilter).filter(searchFilter(searchKey)) }
                     .subscribe({
                         storiesAdapter.setNewData(it)
                     }, Throwable::printStackTrace)
@@ -66,6 +74,10 @@ class MainActivity : AppCompatActivity() {
                         favoritedStoriesAdapter.setNewData(it)
                     }, Throwable::printStackTrace)
         }
+    }
+
+    private fun searchFilter(s: String): (Story) -> Boolean {
+        return { t: Story -> t.title.removeAccent().removeWhiteSpaces().contains(s.removeAccent().removeWhiteSpaces()) }
     }
 
     private inner class TabAdapter : PagerAdapter() {
