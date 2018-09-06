@@ -1,6 +1,10 @@
 package app.truyencuoidangian
 
+import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.Observer
 import android.content.Intent
+import android.content.pm.PathPermission
 import android.os.Bundle
 import android.support.v4.view.PagerAdapter
 import android.support.v7.app.AppCompatActivity
@@ -8,26 +12,33 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import app.truyencuoidangian.fragment.FilterDialog
+import app.truyencuoidangian.fragment.RewardDialog
 import app.truyencuoidangian.repository.Story
 import app.truyencuoidangian.repository.StoryDB
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.reward.RewardItem
+import com.google.android.gms.ads.reward.RewardedVideoAd
+import com.google.android.gms.ads.reward.RewardedVideoAdListener
 import com.jakewharton.rxbinding2.widget.textChanges
+import io.paperdb.Paper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import java.lang.ref.WeakReference
 import java.util.concurrent.TimeUnit
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
     private val tabAdapter = TabAdapter()
     private val storiesAdapter = StoryAdapter(R.layout.item_story, ArrayList())
     private val favoritedStoriesAdapter = StoryAdapter(R.layout.item_story, ArrayList())
     private var mAdView: AdView? = null
-
+    private var mRewardedVideoAd: RewardedVideoAd? = null
     val filterReadStories = { t: Story -> t.lastView != null && t.id != -1 }
     val filterUnReadStories = { t: Story -> t.lastView == null && t.id != -1 }
     val filterAllStories = { t: Story -> t.id != -1 }
@@ -35,6 +46,8 @@ class MainActivity : AppCompatActivity() {
     val filterFolkStories = { t: Story -> t.category == 2 && t.id != -1 }
     var searchKey: String = ""
     var currentFilter = filterAllStories
+    val watchedTimes = MutableLiveData<Int>()
+    val WATCH_STRING = "WATCH_TIMES"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +56,17 @@ class MainActivity : AppCompatActivity() {
         mAdView = findViewById(R.id.adView)
         val adRequest = if (BuildConfig.DEBUG) AdRequest.Builder().addTestDevice("A335A7A192255371F76D62FA9B9B66B6").build() else AdRequest.Builder().build()
         mAdView?.loadAd(adRequest)
+        // Use an activity context to get the rewarded video instance.
+        mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(this)
+        mRewardedVideoAd!!.rewardedVideoAdListener = this
 
+        watchedTimes.observe(this, Observer { times ->
+            tv_times?.text = times.toString()
+            Paper.book().write(WATCH_STRING, times)
+        })
+
+        watchedTimes.value = Paper.book().read(WATCH_STRING, 5)
+        tv_times.text = watchedTimes.toString()
         vp.adapter = tabAdapter
         tabs.setupWithViewPager(vp)
         // create fake story using for trigger reload data
@@ -51,14 +74,19 @@ class MainActivity : AppCompatActivity() {
         initStories()
 
         storiesAdapter.onItemClickListener = BaseQuickAdapter.OnItemClickListener { _, _, position ->
-            val story = storiesAdapter.data[position]
-            if (story.lastView == null) {
-                story.lastView = System.currentTimeMillis()
-                StoryDB.getInstance(this)!!.StoryDao().updateStory(story)
+            if (watchedTimes.value!! > 0) {
+                watchedTimes.value = watchedTimes.value!! - 1
+                val story = storiesAdapter.data[position]
+                if (story.lastView == null) {
+                    story.lastView = System.currentTimeMillis()
+                    StoryDB.getInstance(this)!!.StoryDao().updateStory(story)
+                }
+                val i = Intent(this, ContentActivity::class.java)
+                i.putExtra("STORY_ID", story.id)
+                startActivity(i)
+            } else {
+                showRewardDialog()
             }
-            val i = Intent(this, ContentActivity::class.java)
-            i.putExtra("STORY_ID", story.id)
-            startActivity(i)
         }
 
         storiesAdapter.onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
@@ -70,14 +98,19 @@ class MainActivity : AppCompatActivity() {
         }
 
         favoritedStoriesAdapter.onItemClickListener = BaseQuickAdapter.OnItemClickListener { _, _, position ->
-            val story = favoritedStoriesAdapter.data[position]
-            if (story.lastView == null) {
-                story.lastView = System.currentTimeMillis()
-                StoryDB.getInstance(this)!!.StoryDao().updateStory(story)
+            if (watchedTimes.value!! > 0) {
+                watchedTimes.value = watchedTimes.value!! - 1
+                val story = favoritedStoriesAdapter.data[position]
+                if (story.lastView == null) {
+                    story.lastView = System.currentTimeMillis()
+                    StoryDB.getInstance(this)!!.StoryDao().updateStory(story)
+                }
+                val i = Intent(this, ContentActivity::class.java)
+                i.putExtra("STORY_ID", story.id)
+                startActivity(i)
+            } else {
+                showRewardDialog()
             }
-            val i = Intent(this, ContentActivity::class.java)
-            i.putExtra("STORY_ID", story.id)
-            startActivity(i)
         }
 
         favoritedStoriesAdapter.onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
@@ -99,6 +132,29 @@ class MainActivity : AppCompatActivity() {
         ic_filter.setOnClickListener {
             val dialog = FilterDialog()
             dialog.show(supportFragmentManager, "filter_dialog")
+        }
+        ic_key.setOnClickListener {
+            showRewardDialog()
+        }
+
+        loadRewardedVideoAd()
+    }
+
+    private fun showRewardDialog() {
+        val dialog = RewardDialog()
+        dialog.show(supportFragmentManager, "reward_dialog")
+    }
+
+    private fun loadRewardedVideoAd() {
+        mRewardedVideoAd!!.loadAd(rewardAdId,
+                AdRequest.Builder().build())
+    }
+
+    fun showRewardAd() {
+        if (mRewardedVideoAd!!.isLoaded) {
+            mRewardedVideoAd!!.show()
+        } else {
+            Toast.makeText(this, "Hiện tại chưa có quảng cáo. Vui lòng thử lại sau.", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -169,5 +225,47 @@ class MainActivity : AppCompatActivity() {
                 addOnClickListener(R.id.ic_favorite)
             }
         }
+    }
+
+    override fun onRewarded(reward: RewardItem) {
+        // Reward the user.
+    }
+
+    override fun onRewardedVideoAdLeftApplication() {
+    }
+
+    override fun onRewardedVideoAdClosed() {
+        loadRewardedVideoAd()
+    }
+
+    override fun onRewardedVideoAdFailedToLoad(errorCode: Int) {
+    }
+
+    override fun onRewardedVideoAdLoaded() {
+    }
+
+    override fun onRewardedVideoAdOpened() {
+    }
+
+    override fun onRewardedVideoStarted() {
+    }
+
+    override fun onRewardedVideoCompleted() {
+        watchedTimes.value = watchedTimes.value!! + 1
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mRewardedVideoAd!!.pause(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mRewardedVideoAd!!.resume(this)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mRewardedVideoAd!!.destroy(this)
     }
 }

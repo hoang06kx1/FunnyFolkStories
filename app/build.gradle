@@ -43,5 +43,5 @@ dependencies {
     implementation 'com.uncopt:android.justified:1.0'
     implementation 'com.jakewharton.rxbinding2:rxbinding-kotlin:2.1.1'
     implementation 'com.google.android.gms:play-services-ads:15.0.0'
-
+    implementation 'io.paperdb:paperdb:2.6'
 }

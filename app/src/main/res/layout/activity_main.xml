@@ -23,8 +23,10 @@
 
             <ImageView
                 android:id="@+id/ic_filter"
-                android:layout_width="@dimen/icon_default"
-                android:layout_height="@dimen/icon_default"
+                android:layout_width="wrap_content"
+                android:layout_height="24dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
                 android:src="@drawable/ic_filter_unselected"
                 />
 
@@ -46,13 +48,15 @@
                 android:layout_weight="1"/>
 
             <ImageView
-                android:layout_width="@dimen/icon_default"
+                android:id="@+id/ic_key"
+                android:layout_width="wrap_content"
                 android:layout_height="@dimen/icon_default"
                 android:src="@drawable/ic_key"
-                android:layout_marginRight="8dp"/>
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"/>
 
             <TextView
-                android:id="@+id/tv_key"
+                android:id="@+id/tv_times"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/font_default"
