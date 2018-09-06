@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
+import app.truyencuoidangian.fragment.FilterDialog
 import app.truyencuoidangian.repository.Story
 import app.truyencuoidangian.repository.StoryDB
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -23,8 +24,8 @@ class MainActivity : AppCompatActivity() {
     private val tabAdapter = TabAdapter()
     private val storiesAdapter = StoryAdapter(R.layout.item_story, ArrayList())
     private val favoritedStoriesAdapter = StoryAdapter(R.layout.item_story, ArrayList())
-    val filterReadStories = { t: Story -> t.read != null && t.id != -1 }
-    val filterUnReadStories = { t: Story -> t.read == null && t.id != -1 }
+    val filterReadStories = { t: Story -> t.lastView != null && t.id != -1 }
+    val filterUnReadStories = { t: Story -> t.lastView == null && t.id != -1 }
     val filterAllStories = { t: Story -> t.id != -1 }
     val filterObsceneStories = { t: Story -> t.category == 1 && t.id != -1 }
     val filterFolkStories = { t: Story -> t.category == 2 && t.id != -1 }
@@ -85,6 +86,11 @@ class MainActivity : AppCompatActivity() {
                     searchKey = it.toString()
                     StoryDB.getInstance(this)!!.StoryDao().triggerReload()
                 }
+
+        ic_filter.setOnClickListener {
+            val dialog = FilterDialog()
+            dialog.show(supportFragmentManager, "filter_dialog")
+        }
     }
 
     private fun initStories() {
@@ -98,7 +104,7 @@ class MainActivity : AppCompatActivity() {
 
             getFavoriteStories().subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .map { it.filter(searchFilter(searchKey)) }
+                    .map { it.filter(currentFilter).filter(searchFilter(searchKey)) }
                     .subscribe({
                         favoritedStoriesAdapter.setNewData(it)
                     }, Throwable::printStackTrace)

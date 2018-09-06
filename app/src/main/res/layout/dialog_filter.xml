@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minWidth="280dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/bg_popup_title"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="LỌC KẾT QUẢ"
+        android:textColor="@color/text_search"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <RadioGroup
+            android:id="@+id/rb_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/rb_all"
+                style="@style/rb_filter"
+                android:checked="true"
+                android:layout_marginTop="8dp"
+                android:text="Tất cả"
+                app:buttonTint="@color/colorPrimary"/>
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/rb_read"
+                style="@style/rb_filter"
+                android:text="Đã xem"
+                app:buttonTint="@color/colorPrimary"/>
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/rb_unread"
+                style="@style/rb_filter"
+                android:text="Chưa xem"
+                app:buttonTint="@color/colorPrimary"/>
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/rb_obscene"
+                style="@style/rb_filter"
+                android:text="Truyện cười tục tĩu bậy bạ"
+                app:buttonTint="@color/colorPrimary"/>
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/rb_folk"
+                style="@style/rb_filter"
+                android:text="Truyện cười dân gian"
+                app:buttonTint="@color/colorPrimary"/>
+        </RadioGroup>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/bt_ok"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="Đồng ý"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/font_default"/>
+</LinearLayout>
