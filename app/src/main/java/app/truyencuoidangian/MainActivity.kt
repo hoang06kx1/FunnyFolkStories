@@ -21,11 +21,11 @@ class MainActivity : AppCompatActivity() {
     private val tabAdapter = TabAdapter()
     private val storiesAdapter = StoryAdapter(R.layout.item_story, ArrayList())
     private val favoritedStoriesAdapter = StoryAdapter(R.layout.item_story, ArrayList())
-    val filterReadStories = { t: Story -> t.read != null }
-    val filterUnReadStories = { t: Story -> t.read == null }
-    val filterAllStories = { t: Story -> true }
-    val filterObsceneStories = { t: Story -> t.category == 1 }
-    val filterFolkStories = { t: Story -> t.category == 2 }
+    val filterReadStories = { t: Story -> t.read != null && t.id != -1}
+    val filterUnReadStories = { t: Story -> t.read == null && t.id != -1}
+    val filterAllStories = { t: Story -> t.id != -1 }
+    val filterObsceneStories = { t: Story -> t.category == 1 && t.id != -1}
+    val filterFolkStories = { t: Story -> t.category == 2 && t.id != -1}
     var searchKey: String = ""
     var currentFilter = filterAllStories
 
@@ -34,6 +34,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         vp.adapter = tabAdapter
         tabs.setupWithViewPager(vp)
+        // create fake story using for trigger reload data
+        StoryDB.getInstance(this)!!.StoryDao().insertStory(Story(-1, "Faked", "Faked story", null, 1, null, null, "faked"))
         initStories()
 
         storiesAdapter.onItemClickListener = BaseQuickAdapter.OnItemClickListener { _, _, position ->
@@ -46,17 +48,33 @@ class MainActivity : AppCompatActivity() {
             i.putExtra("STORY_ID", story.id)
             startActivity(i)
         }
-        favoritedStoriesAdapter.onItemClickListener = storiesAdapter.onItemClickListener
 
         storiesAdapter.onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
             if (view.id == R.id.ic_favorite) {
                 val story = storiesAdapter.data[position]
                 story.favorited = if (story.favorited == 1) 0 else 1
                 StoryDB.getInstance(this)!!.StoryDao().updateStory(story)
-                initStories()
             }
         }
-        favoritedStoriesAdapter.onItemChildClickListener = storiesAdapter.onItemChildClickListener
+
+        favoritedStoriesAdapter.onItemClickListener = BaseQuickAdapter.OnItemClickListener { _, _, position ->
+            val story = favoritedStoriesAdapter.data[position]
+            if (story.lastView == null) {
+                story.lastView = System.currentTimeMillis()
+                StoryDB.getInstance(this)!!.StoryDao().updateStory(story)
+            }
+            val i = Intent(this, ContentActivity::class.java)
+            i.putExtra("STORY_ID", story.id)
+            startActivity(i)
+        }
+
+        favoritedStoriesAdapter.onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
+            if (view.id == R.id.ic_favorite) {
+                val story = favoritedStoriesAdapter.data[position]
+                story.favorited = if (story.favorited == 1) 0 else 1
+                StoryDB.getInstance(this)!!.StoryDao().updateStory(story)
+            }
+        }
     }
 
     private fun initStories() {
@@ -77,7 +95,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun searchFilter(s: String): (Story) -> Boolean {
-        return { t: Story -> t.title.removeAccent().removeWhiteSpaces().contains(s.removeAccent().removeWhiteSpaces()) }
+        return { t: Story -> t.title.removeAccent().removeWhiteSpaces().contains(s.removeAccent().removeWhiteSpaces()) && t.id != -1}
     }
 
     private inner class TabAdapter : PagerAdapter() {
