@@ -19,7 +19,8 @@
     <ScrollView
         android:scrollbarStyle="outsideInset"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:clipChildren="false"
         android:clipToPadding="false"
         android:padding="@dimen/padding_screen"
@@ -68,4 +69,11 @@
                 tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus sapien ligula, euismod eu magna id, dapibus venenatis lorem. Integer et molestie ante, et rutrum justo. Proin ac eleifend enim. Maecenas laoreet fermentum urna, gravida maximus massa varius semper. Nulla venenatis, massa a blandit feugiat, massa turpis vehicula justo, eu lacinia eros elit sed neque. Nulla facilisi. Quisque scelerisque nisl ac tortor ullamcorper pellentesque. Sed aliquam ultrices turpis, nec tempus tellus semper et. Proin tincidunt rhoncus justo eu consectetur. Morbi hendrerit dictum augue ut cursus. Vestibulum sit amet justo dui. "/>
         </LinearLayout>
     </ScrollView>
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:adSize="SMART_BANNER"
+        app:adUnitId="ca-app-pub-3940256099942544/6300978111"/>
 </LinearLayout>

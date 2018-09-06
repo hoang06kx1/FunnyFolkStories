@@ -13,6 +13,8 @@ import app.truyencuoidangian.repository.Story
 import app.truyencuoidangian.repository.StoryDB
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
 import com.jakewharton.rxbinding2.widget.textChanges
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -24,6 +26,8 @@ class MainActivity : AppCompatActivity() {
     private val tabAdapter = TabAdapter()
     private val storiesAdapter = StoryAdapter(R.layout.item_story, ArrayList())
     private val favoritedStoriesAdapter = StoryAdapter(R.layout.item_story, ArrayList())
+    private var mAdView: AdView? = null
+
     val filterReadStories = { t: Story -> t.lastView != null && t.id != -1 }
     val filterUnReadStories = { t: Story -> t.lastView == null && t.id != -1 }
     val filterAllStories = { t: Story -> t.id != -1 }
@@ -35,6 +39,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        // ad init
+        mAdView = findViewById(R.id.adView)
+        val adRequest = if (BuildConfig.DEBUG) AdRequest.Builder().addTestDevice("A335A7A192255371F76D62FA9B9B66B6").build() else AdRequest.Builder().build()
+        mAdView?.loadAd(adRequest)
+
         vp.adapter = tabAdapter
         tabs.setupWithViewPager(vp)
         // create fake story using for trigger reload data
