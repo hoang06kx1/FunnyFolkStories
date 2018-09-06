@@ -19,13 +19,13 @@ class FilterDialog: DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         (activity as MainActivity).apply {
-            rb_group.clearCheck()
+            this@FilterDialog.rb_group.clearCheck()
             when (currentFilter) {
-                filterAllStories -> rb_all.isChecked = true
-                filterFolkStories -> rb_folk.isChecked = true
-                filterObsceneStories -> rb_obscene.isChecked = true
-                filterUnReadStories -> rb_unread.isChecked = true
-                filterReadStories -> rb_read.isChecked = true
+                filterAllStories -> this@FilterDialog.rb_all.isChecked = true
+                filterFolkStories -> this@FilterDialog.rb_folk.isChecked = true
+                filterObsceneStories -> this@FilterDialog.rb_obscene.isChecked = true
+                filterUnReadStories -> this@FilterDialog.rb_unread.isChecked = true
+                filterReadStories -> this@FilterDialog.rb_read.isChecked = true
             }
         }
 
