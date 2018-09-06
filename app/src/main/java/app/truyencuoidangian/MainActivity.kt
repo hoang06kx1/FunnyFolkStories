@@ -12,20 +12,22 @@ import app.truyencuoidangian.repository.Story
 import app.truyencuoidangian.repository.StoryDB
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
+import com.jakewharton.rxbinding2.widget.textChanges
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import java.lang.ref.WeakReference
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
     private val tabAdapter = TabAdapter()
     private val storiesAdapter = StoryAdapter(R.layout.item_story, ArrayList())
     private val favoritedStoriesAdapter = StoryAdapter(R.layout.item_story, ArrayList())
-    val filterReadStories = { t: Story -> t.read != null && t.id != -1}
-    val filterUnReadStories = { t: Story -> t.read == null && t.id != -1}
+    val filterReadStories = { t: Story -> t.read != null && t.id != -1 }
+    val filterUnReadStories = { t: Story -> t.read == null && t.id != -1 }
     val filterAllStories = { t: Story -> t.id != -1 }
-    val filterObsceneStories = { t: Story -> t.category == 1 && t.id != -1}
-    val filterFolkStories = { t: Story -> t.category == 2 && t.id != -1}
+    val filterObsceneStories = { t: Story -> t.category == 1 && t.id != -1 }
+    val filterFolkStories = { t: Story -> t.category == 2 && t.id != -1 }
     var searchKey: String = ""
     var currentFilter = filterAllStories
 
@@ -75,6 +77,14 @@ class MainActivity : AppCompatActivity() {
                 StoryDB.getInstance(this)!!.StoryDao().updateStory(story)
             }
         }
+
+        edt_search.textChanges()
+                .debounce(400, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    searchKey = it.toString()
+                    StoryDB.getInstance(this)!!.StoryDao().triggerReload()
+                }
     }
 
     private fun initStories() {
@@ -88,6 +98,7 @@ class MainActivity : AppCompatActivity() {
 
             getFavoriteStories().subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .map { it.filter(searchFilter(searchKey)) }
                     .subscribe({
                         favoritedStoriesAdapter.setNewData(it)
                     }, Throwable::printStackTrace)
@@ -95,7 +106,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun searchFilter(s: String): (Story) -> Boolean {
-        return { t: Story -> t.title.removeAccent().removeWhiteSpaces().contains(s.removeAccent().removeWhiteSpaces()) && t.id != -1}
+        return { t: Story -> t.title.removeAccent().removeWhiteSpaces().contains(s.removeAccent().removeWhiteSpaces(), true) && t.id != -1 }
     }
 
     private inner class TabAdapter : PagerAdapter() {

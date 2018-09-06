@@ -41,4 +41,5 @@ dependencies {
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.27'
     implementation 'com.github.daolq3012:AssetSQLiteOpenHelper:1.0'
     implementation 'com.uncopt:android.justified:1.0'
+    implementation 'com.jakewharton.rxbinding2:rxbinding-kotlin:2.1.1'
 }
