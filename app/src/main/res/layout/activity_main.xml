@@ -24,6 +24,25 @@
         android:background="@android:color/white"
         />
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/bg_popup_title">
+
+        <EditText
+            android:drawableLeft="@drawable/ic_search"
+            android:drawablePadding="8dp"
+            android:textSize="@dimen/font_default"
+            android:hint="Tìm kiếm"
+            android:layout_margin="8dp"
+            android:padding="5dp"
+            android:id="@+id/edt_search"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_search"/>
+    </FrameLayout>
+
     <android.support.v4.view.ViewPager
         android:id="@+id/vp"
         android:layout_width="match_parent"
