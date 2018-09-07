@@ -1,5 +1,7 @@
 package app.truyencuoidangian.fragment
 
+import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.Observer
 import android.bluetooth.BluetoothHealthAppConfiguration
 import android.graphics.Color
 import android.graphics.drawable.Drawable
@@ -24,6 +26,7 @@ class SettingDialog : DialogFragment() {
     }
 
     lateinit var setting: AppSetting
+    val size = MutableLiveData<Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,13 +39,33 @@ class SettingDialog : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        size.observe(this, Observer {
+            tv_size.text = it.toString()
+            setting.textSize = it!!
+        })
+
         setting = Paper.book().read("SETTING")
+        size.value = setting.textSize
+
         bt_text_color.setOnClickListener {
             MainActivity.sInstance!!.showColorDialog(234)
         }
         bt_bg_color.setOnClickListener {
             MainActivity.sInstance!!.showColorDialog(123)
         }
+
+        bt_minus.setOnClickListener {
+            if (size.value!! > 12) {
+                size.value = size.value!! - 1
+            }
+        }
+
+        bt_plus.setOnClickListener {
+            if (size.value!! < 32) {
+                size.value = size.value!! + 1
+            }
+        }
+
         bt_ok.setOnClickListener {
             Paper.book().write("SETTING", setting)
             MainActivity.sInstance!!.triggerReload()

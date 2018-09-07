@@ -9,6 +9,7 @@ import kotlinx.android.synthetic.main.activity_content.*
 import java.text.SimpleDateFormat
 import java.util.*
 import android.content.Intent
+import android.util.TypedValue
 import android.view.View
 import app.truyencuoidangian.repository.AppSetting
 import com.google.android.gms.ads.AdListener
@@ -44,6 +45,7 @@ class ContentActivity : AppCompatActivity() {
         tv_content.setTextColor(setting.textColor)
         tv_title.setTextColor(setting.textColor)
         scrollView.setBackgroundColor(setting.backgroundColor)
+        tv_content.setTextSize(TypedValue.COMPLEX_UNIT_DIP, setting.textSize.toFloat())
 
         id = intent.getIntExtra("STORY_ID", -1)
         val story = StoryDB.getInstance(this)!!.StoryDao().getStory(id)

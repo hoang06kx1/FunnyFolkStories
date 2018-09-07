@@ -14,6 +14,7 @@ import android.support.v7.util.DiffUtil
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
+import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
@@ -282,6 +283,8 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener, ColorPickerDi
                 }
                 setting?.let {
                     getView<TextView>(R.id.tv_name).setTextColor(it.textColor)
+                    getView<TextView>(R.id.tv_name).setTextSize(TypedValue.COMPLEX_UNIT_DIP, it.textSize.toFloat())
+
                     getView<View>(R.id.item_bg).setBackgroundColor(it.backgroundColor)
                 }
                 addOnClickListener(R.id.ic_favorite)
