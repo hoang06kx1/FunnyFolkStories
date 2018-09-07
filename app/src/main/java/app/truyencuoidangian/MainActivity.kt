@@ -8,6 +8,7 @@ import android.content.pm.PathPermission
 import android.os.Bundle
 import android.support.v4.view.PagerAdapter
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.util.DiffUtil
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
@@ -34,25 +35,30 @@ import java.lang.ref.WeakReference
 import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
+    companion object {
+        var sInstance: MainActivity? = null
+    }
+
     private val tabAdapter = TabAdapter()
     private val storiesAdapter = StoryAdapter(R.layout.item_story, ArrayList())
     private val favoritedStoriesAdapter = StoryAdapter(R.layout.item_story, ArrayList())
     private var mAdView: AdView? = null
     private var mRewardedVideoAd: RewardedVideoAd? = null
-    val filterReadStories = { t: Story -> t.lastView != null && t.id != -1 }
-    val filterUnReadStories = { t: Story -> t.lastView == null && t.id != -1 }
-    val filterAllStories = { t: Story -> t.id != -1 }
-    val filterObsceneStories = { t: Story -> t.category == 1 && t.id != -1 }
-    val filterFolkStories = { t: Story -> t.category == 2 && t.id != -1 }
-    val filterFavoriteStories = { t: Story -> t.favorited == 1 && t.id != -1 }
+    val filterReadStories = { t: Story -> t.lastView != null }
+    val filterUnReadStories = { t: Story -> t.lastView == null }
+    val filterAllStories = { t: Story -> true }
+    val filterObsceneStories = { t: Story -> t.category == 1 }
+    val filterFolkStories = { t: Story -> t.category == 2 }
+    val filterFavoriteStories = { t: Story -> t.favorited == 1 }
     var searchKey: String = ""
     var currentFilter = filterAllStories
     val watchedTimes = MutableLiveData<Int>()
-    val stories = MutableLiveData<ArrayList<Story>>()
+    val stories = MutableLiveData<HashMap<Int, Story>>()
     val WATCH_STRING = "WATCH_TIMES"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        sInstance = this
         setContentView(R.layout.activity_main)
         // ad init
         mAdView = findViewById(R.id.adView)
@@ -67,7 +73,7 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
             Paper.book().write(WATCH_STRING, times)
         })
 
-        watchedTimes.value = Paper.book().read(WATCH_STRING, 5)
+        watchedTimes.value = Paper.book().read(WATCH_STRING, if (BuildConfig.DEBUG) 10000 else 5)
         tv_times.text = watchedTimes.toString()
         vp.adapter = tabAdapter
         tabs.setupWithViewPager(vp)
@@ -79,7 +85,8 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
                 val story = storiesAdapter.data[position]
                 if (story.lastView == null) {
                     story.lastView = System.currentTimeMillis()
-                    StoryDB.getInstance(this)!!.StoryDao().updateStory(story)
+                    updateStory(story)
+//                    StoryDB.getInstance(this)!!.StoryDao().updateStory(story)
                 }
                 val i = Intent(this, ContentActivity::class.java)
                 i.putExtra("STORY_ID", story.id)
@@ -93,7 +100,8 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
             if (view.id == R.id.ic_favorite) {
                 val story = storiesAdapter.data[position]
                 story.favorited = if (story.favorited == 1) 0 else 1
-                StoryDB.getInstance(this)!!.StoryDao().updateStory(story)
+                updateStory(story)
+//                StoryDB.getInstance(this)!!.StoryDao().updateStory(story)
             }
         }
 
@@ -103,7 +111,8 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
                 val story = favoritedStoriesAdapter.data[position]
                 if (story.lastView == null) {
                     story.lastView = System.currentTimeMillis()
-                    StoryDB.getInstance(this)!!.StoryDao().updateStory(story)
+                    updateStory(story)
+//                    StoryDB.getInstance(this)!!.StoryDao().updateStory(story)
                 }
                 val i = Intent(this, ContentActivity::class.java)
                 i.putExtra("STORY_ID", story.id)
@@ -117,7 +126,8 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
             if (view.id == R.id.ic_favorite) {
                 val story = favoritedStoriesAdapter.data[position]
                 story.favorited = if (story.favorited == 1) 0 else 1
-                StoryDB.getInstance(this)!!.StoryDao().updateStory(story)
+                updateStory(story)
+//                StoryDB.getInstance(this)!!.StoryDao().updateStory(story)
             }
         }
 
@@ -144,6 +154,12 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
         stories.value = stories.value // re-assign to trigger observable emit items
     }
 
+    fun updateStory(story: Story) {
+        StoryDB.getInstance(this)!!.StoryDao().updateStoryToDB(story)
+        stories.value?.put(story.id, story)
+        stories.value = stories.value
+    }
+
     private fun showRewardDialog() {
         val dialog = RewardDialog()
         dialog.show(supportFragmentManager, "reward_dialog")
@@ -165,8 +181,9 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
     private fun initStories() {
         stories.observe(this, Observer { stories ->
             if (stories != null) {
-                storiesAdapter.setNewData(stories.filter(currentFilter).filter(searchFilter(searchKey)))
-                favoritedStoriesAdapter.setNewData(stories.filter(filterFavoriteStories).filter(currentFilter).filter(searchFilter(searchKey)))
+                val listStories = stories.values
+                storiesAdapter.updateData(listStories.filter(currentFilter).filter(searchFilter(searchKey)))
+                favoritedStoriesAdapter.updateData(listStories.filter(filterFavoriteStories).filter(currentFilter).filter(searchFilter(searchKey)))
             }
         })
 
@@ -176,8 +193,7 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
                     .subscribe({
                         // create fake story using for trigger reload data
                         val listStories = ArrayList(it)
-                        listStories.add(Story(-1, "Faked", "Faked story", null, 1, null, null, "faked"))
-                        stories.value = ArrayList(it)
+                        stories.value = HashMap(listStories.associateBy({ it.id }, { it }))
                     }, Throwable::printStackTrace)
         }
     }
@@ -231,6 +247,13 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
                 addOnClickListener(R.id.ic_favorite)
             }
         }
+
+        fun updateData(newList: List<Story>) {
+            val diffResult = DiffUtil.calculateDiff(StoryDiff(this.mData, newList))
+            this.mData.clear()
+            this.mData = newList
+            diffResult.dispatchUpdatesTo(this)
+        }
     }
 
     override fun onRewarded(reward: RewardItem) {
@@ -273,5 +296,26 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
     override fun onDestroy() {
         super.onDestroy()
         mRewardedVideoAd!!.destroy(this)
+    }
+
+    class StoryDiff(val oldList: List<Story>, val newList: List<Story>) : DiffUtil.Callback() {
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition].id == newList[newItemPosition].id
+        }
+
+        override fun getOldListSize(): Int {
+            return oldList.size
+        }
+
+        override fun getNewListSize(): Int {
+            return newList.size
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            val oldItem = oldList[oldItemPosition]
+            val newItem = newList[newItemPosition]
+            return (oldItem.id == newItem.id) && (oldItem.favorited == newItem.favorited) && (oldItem.read == newItem.read) && (oldItem.lastView == newItem.lastView)
+        }
     }
 }

@@ -35,7 +35,7 @@ class ContentActivity : AppCompatActivity() {
         ic_favorite.setOnClickListener {
             story.favorited = if (story.favorited == 1) 0 else 1
             ic_favorite.setImageResource(if (story.favorited == 1) R.drawable.ic_favorite else R.drawable.ic_favorite_grey)
-            StoryDB.getInstance(this)!!.StoryDao().updateStory(story)
+            MainActivity.sInstance?.updateStory(story)
         }
     }
 

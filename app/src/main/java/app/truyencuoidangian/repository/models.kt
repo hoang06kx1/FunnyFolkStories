@@ -45,7 +45,7 @@ interface StoryDao {
     fun getFolkStories(): Flowable<List<Story>>
 
     @Update
-    fun updateStory(story: Story)
+    fun updateStoryToDB(story: Story)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertStory(story: Story)
