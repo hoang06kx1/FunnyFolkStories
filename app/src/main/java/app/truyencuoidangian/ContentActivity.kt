@@ -38,16 +38,4 @@ class ContentActivity : AppCompatActivity() {
             MainActivity.sInstance?.updateStory(story)
         }
     }
-
-    fun getTimeString(timestamp: Long?): String {
-        var time = System.currentTimeMillis()
-        if (timestamp != null && timestamp > 0) {
-            time = timestamp
-        }
-        val formatter = SimpleDateFormat("dd/MM/yyyy")
-        val dateString = formatter.format(Date(time))
-        val timeFormatter = SimpleDateFormat("HH:mm:ss")
-        val hourString = timeFormatter.format(time)
-        return "Đã xem vào lúc $hourString ngày $dateString"
-    }
 }

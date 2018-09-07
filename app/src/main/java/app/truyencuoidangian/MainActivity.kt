@@ -3,6 +3,7 @@ package app.truyencuoidangian
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
+import android.arch.persistence.room.util.StringUtil
 import android.content.Intent
 import android.content.pm.PathPermission
 import android.os.Bundle
@@ -11,6 +12,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -37,6 +39,7 @@ import java.util.concurrent.TimeUnit
 class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
     companion object {
         var sInstance: MainActivity? = null
+        var filterTimes: Int = 0
     }
 
     private val tabAdapter = TabAdapter()
@@ -46,7 +49,10 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
     private var mRewardedVideoAd: RewardedVideoAd? = null
     val filterReadStories = { t: Story -> t.lastView != null }
     val filterUnReadStories = { t: Story -> t.lastView == null }
-    val filterAllStories = { t: Story -> true }
+    val filterAllStories = { t: Story ->
+        filterTimes++
+        true
+    }
     val filterObsceneStories = { t: Story -> t.category == 1 }
     val filterFolkStories = { t: Story -> t.category == 2 }
     val filterFavoriteStories = { t: Story -> t.favorited == 1 }
@@ -183,8 +189,7 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
         stories.observe(this, Observer { stories ->
             if (stories != null) {
                 val listStories = stories.values
-//                storiesAdapter.updateData(listStories.filter(currentFilter).filter(searchFilter(searchKey)))
-                storiesAdapter.updateData(listStories.toList())
+                storiesAdapter.updateData(listStories.filter(currentFilter).filter(searchFilter(searchKey)))
                 favoritedStoriesAdapter.updateData(listStories.filter(filterFavoriteStories).filter(currentFilter).filter(searchFilter(searchKey)))
             }
         })
@@ -201,7 +206,7 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
     }
 
     private fun searchFilter(s: String): (Story) -> Boolean {
-        return { t: Story -> t.title.removeAccent().removeWhiteSpaces().contains(s.removeAccent().removeWhiteSpaces(), true) }
+        return { t: Story -> t.slug!!.contains(s, true) }
     }
 
     private inner class TabAdapter : PagerAdapter() {
@@ -241,6 +246,12 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
         override fun convert(helper: BaseViewHolder?, item: Story?) {
             helper?.apply {
                 setText(R.id.tv_name, item?.title)
+                if (getTimeString(item?.lastView) == "") {
+                    getView<View>(R.id.tv_time).visibility = View.GONE
+                } else {
+                    getView<View>(R.id.tv_time).visibility = View.VISIBLE
+                    setText(R.id.tv_time, getTimeString(item?.lastView))
+                }
                 if (item?.favorited == 1) {
                     setImageResource(R.id.ic_favorite, R.drawable.ic_favorite)
                 } else {
@@ -251,10 +262,11 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
         }
 
         fun updateData(newList: List<Story>) {
-            val diffResult = DiffUtil.calculateDiff(StoryDiff(this.mData, newList))
-            this.mData.clear()
-            this.mData = newList
-            diffResult.dispatchUpdatesTo(this)
+//            val diffResult = DiffUtil.calculateDiff(StoryDiff(this.mData, newList))
+//            this.mData.clear()
+//            this.mData = newList
+//            diffResult.dispatchUpdatesTo(this)
+            this.setNewData(newList)
         }
     }
 
