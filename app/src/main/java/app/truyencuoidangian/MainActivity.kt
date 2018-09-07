@@ -39,7 +39,6 @@ import java.util.concurrent.TimeUnit
 class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
     companion object {
         var sInstance: MainActivity? = null
-        var filterTimes: Int = 0
     }
 
     private val tabAdapter = TabAdapter()
@@ -49,10 +48,7 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
     private var mRewardedVideoAd: RewardedVideoAd? = null
     val filterReadStories = { t: Story -> t.lastView != null }
     val filterUnReadStories = { t: Story -> t.lastView == null }
-    val filterAllStories = { t: Story ->
-        filterTimes++
-        true
-    }
+    val filterAllStories = { t: Story -> true }
     val filterObsceneStories = { t: Story -> t.category == 1 }
     val filterFolkStories = { t: Story -> t.category == 2 }
     val filterFavoriteStories = { t: Story -> t.favorited == 1 }
