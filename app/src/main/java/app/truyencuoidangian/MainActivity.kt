@@ -22,6 +22,7 @@ import app.truyencuoidangian.repository.Story
 import app.truyencuoidangian.repository.StoryDB
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
+import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
@@ -66,6 +67,15 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
         mAdView = findViewById(R.id.adView)
         val adRequest = if (BuildConfig.DEBUG) AdRequest.Builder().addTestDevice("A335A7A192255371F76D62FA9B9B66B6").build() else AdRequest.Builder().build()
         mAdView?.loadAd(adRequest)
+        mAdView?.adListener = object : AdListener() {
+            override fun onAdLoaded() {
+                mAdView?.visibility = View.VISIBLE
+            }
+
+            override fun onAdFailedToLoad(errorCode: Int) {
+                mAdView?.visibility = View.GONE
+            }
+        }
         // Use an activity context to get the rewarded video instance.
         mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(this)
         mRewardedVideoAd!!.rewardedVideoAdListener = this
@@ -75,7 +85,8 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
             Paper.book().write(WATCH_STRING, times)
         })
 
-        watchedTimes.value = Paper.book().read(WATCH_STRING, if (BuildConfig.DEBUG) 10000 else 5)
+//        watchedTimes.value = Paper.book().read(WATCH_STRING, if (BuildConfig.DEBUG) 10000 else 5)
+        watchedTimes.value = Paper.book().read(WATCH_STRING, 5)
         tv_times.text = watchedTimes.toString()
         vp.adapter = tabAdapter
         tabs.setupWithViewPager(vp)
@@ -181,8 +192,8 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
         stories.observe(this, Observer { stories ->
             if (stories != null) {
                 val listStories = stories.values
-                storiesAdapter.updateData(listStories.filter(currentFilter).filter(searchFilter(searchKey)))
-                favoritedStoriesAdapter.updateData(listStories.filter(filterFavoriteStories).filter(currentFilter).filter(searchFilter(searchKey)))
+                storiesAdapter.updateData(listStories.filter(currentFilter).filter(searchFilter(searchKey)).sortedBy { it.id })
+                favoritedStoriesAdapter.updateData(listStories.filter(filterFavoriteStories).filter(currentFilter).filter(searchFilter(searchKey)).sortedBy { it.id })
             }
         })
 

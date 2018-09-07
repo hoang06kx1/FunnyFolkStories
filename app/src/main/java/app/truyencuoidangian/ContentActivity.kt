@@ -9,7 +9,8 @@ import kotlinx.android.synthetic.main.activity_content.*
 import java.text.SimpleDateFormat
 import java.util.*
 import android.content.Intent
-
+import android.view.View
+import com.google.android.gms.ads.AdListener
 
 
 class ContentActivity : AppCompatActivity() {
@@ -24,7 +25,15 @@ class ContentActivity : AppCompatActivity() {
         mAdView = findViewById(R.id.adView)
         val adRequest = if (BuildConfig.DEBUG) AdRequest.Builder().addTestDevice("A335A7A192255371F76D62FA9B9B66B6").build() else AdRequest.Builder().build()
         mAdView?.loadAd(adRequest)
+        mAdView?.adListener = object : AdListener() {
+            override fun onAdLoaded() {
+                mAdView?.visibility = View.VISIBLE
+            }
 
+            override fun onAdFailedToLoad(errorCode: Int) {
+                mAdView?.visibility = View.GONE
+            }
+        }
         setSupportActionBar(toolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         supportActionBar!!.setDisplayShowHomeEnabled(true)
