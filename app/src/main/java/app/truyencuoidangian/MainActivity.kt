@@ -16,10 +16,12 @@ import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import app.truyencuoidangian.fragment.FilterDialog
 import app.truyencuoidangian.fragment.RewardDialog
 import app.truyencuoidangian.fragment.SettingDialog
+import app.truyencuoidangian.repository.AppSetting
 import app.truyencuoidangian.repository.Story
 import app.truyencuoidangian.repository.StoryDB
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -94,6 +96,8 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener, ColorPickerDi
         tv_times.text = watchedTimes.toString()
         vp.adapter = tabAdapter
         tabs.setupWithViewPager(vp)
+        storiesAdapter.setting = Paper.book().read("SETTING")
+        favoritedStoriesAdapter.setting = Paper.book().read("SETTING")
         initStories()
 
         storiesAdapter.onItemClickListener = BaseQuickAdapter.OnItemClickListener { _, _, position ->
@@ -168,6 +172,8 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener, ColorPickerDi
     }
 
     fun triggerReload() {
+        storiesAdapter.setting = Paper.book().read("SETTING")
+        favoritedStoriesAdapter.setting = Paper.book().read("SETTING")
         stories.value = stories.value // re-assign to trigger observable emit items
     }
 
@@ -258,6 +264,8 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener, ColorPickerDi
     }
 
     private inner class StoryAdapter(layoutId: Int, stories: List<Story>) : BaseQuickAdapter<Story, BaseViewHolder>(layoutId, stories) {
+        var setting: AppSetting? = null
+
         override fun convert(helper: BaseViewHolder?, item: Story?) {
             helper?.apply {
                 setText(R.id.tv_name, item?.title)
@@ -271,6 +279,10 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener, ColorPickerDi
                     setImageResource(R.id.ic_favorite, R.drawable.ic_favorite)
                 } else {
                     setImageResource(R.id.ic_favorite, R.drawable.ic_favorite_grey)
+                }
+                setting?.let {
+                    getView<TextView>(R.id.tv_name).setTextColor(it.textColor)
+                    getView<View>(R.id.item_bg).setBackgroundColor(it.backgroundColor)
                 }
                 addOnClickListener(R.id.ic_favorite)
             }

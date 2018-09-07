@@ -10,7 +10,9 @@ import java.text.SimpleDateFormat
 import java.util.*
 import android.content.Intent
 import android.view.View
+import app.truyencuoidangian.repository.AppSetting
 import com.google.android.gms.ads.AdListener
+import io.paperdb.Paper
 
 
 class ContentActivity : AppCompatActivity() {
@@ -37,6 +39,11 @@ class ContentActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         supportActionBar!!.setDisplayShowHomeEnabled(true)
+
+        val setting = Paper.book().read<AppSetting>("SETTING")
+        tv_content.setTextColor(setting.textColor)
+        tv_title.setTextColor(setting.textColor)
+        scrollView.setBackgroundColor(setting.backgroundColor)
 
         id = intent.getIntExtra("STORY_ID", -1)
         val story = StoryDB.getInstance(this)!!.StoryDao().getStory(id)

@@ -45,6 +45,7 @@ class SettingDialog : DialogFragment() {
         }
         bt_ok.setOnClickListener {
             Paper.book().write("SETTING", setting)
+            MainActivity.sInstance!!.triggerReload()
             dismiss()
         }
         iv_bg_color.background = createCircleDrawable(setting.backgroundColor)
@@ -62,8 +63,8 @@ class SettingDialog : DialogFragment() {
     }
 
     fun createCircleDrawable(@ColorInt fillColor: Int): Drawable {
-        val strokeWidth = 5
-        val strokeColor = Color.parseColor("#000000")
+        val strokeWidth = 2
+        val strokeColor = Color.parseColor("#8b8a8f")
         val gD = GradientDrawable()
         gD.setColor(fillColor)
         gD.shape = GradientDrawable.OVAL
