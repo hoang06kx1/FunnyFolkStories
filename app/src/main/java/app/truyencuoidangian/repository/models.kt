@@ -2,9 +2,13 @@ package app.truyencuoidangian.repository
 
 import android.arch.persistence.room.*
 import android.content.Context
+import android.support.annotation.ColorInt
 import com.fstyle.library.helper.AssetSQLiteOpenHelperFactory
 import io.reactivex.Flowable
 import io.reactivex.Single
+import java.io.Serializable
+
+class AppSetting(@ColorInt var backgroundColor: Int, @ColorInt var textColor: Int, var textSize: Int): Serializable
 
 @Entity(tableName = "stories")
 data class Story(@PrimaryKey var id: Int,

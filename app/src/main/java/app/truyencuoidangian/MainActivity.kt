@@ -6,6 +6,7 @@ import android.arch.lifecycle.Observer
 import android.arch.persistence.room.util.StringUtil
 import android.content.Intent
 import android.content.pm.PathPermission
+import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.view.PagerAdapter
 import android.support.v7.app.AppCompatActivity
@@ -18,6 +19,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import app.truyencuoidangian.fragment.FilterDialog
 import app.truyencuoidangian.fragment.RewardDialog
+import app.truyencuoidangian.fragment.SettingDialog
 import app.truyencuoidangian.repository.Story
 import app.truyencuoidangian.repository.StoryDB
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -30,6 +32,8 @@ import com.google.android.gms.ads.reward.RewardItem
 import com.google.android.gms.ads.reward.RewardedVideoAd
 import com.google.android.gms.ads.reward.RewardedVideoAdListener
 import com.jakewharton.rxbinding2.widget.textChanges
+import com.jaredrummler.android.colorpicker.ColorPickerDialog
+import com.jaredrummler.android.colorpicker.ColorPickerDialogListener
 import io.paperdb.Paper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -37,7 +41,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import java.lang.ref.WeakReference
 import java.util.concurrent.TimeUnit
 
-class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
+class MainActivity : AppCompatActivity(), RewardedVideoAdListener, ColorPickerDialogListener {
     companion object {
         var sInstance: MainActivity? = null
     }
@@ -156,6 +160,9 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
         ic_key.setOnClickListener {
             showRewardDialog()
         }
+        ic_setting.setOnClickListener {
+            showSettingDialog()
+        }
 
         loadRewardedVideoAd()
     }
@@ -173,6 +180,11 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
     private fun showRewardDialog() {
         val dialog = RewardDialog()
         dialog.show(supportFragmentManager, "reward_dialog")
+    }
+
+    private fun showSettingDialog() {
+        val dialog = SettingDialog()
+        dialog.show(supportFragmentManager, "setting_dialog")
     }
 
     private fun loadRewardedVideoAd() {
@@ -334,5 +346,37 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
             val newItem = newList[newItemPosition]
             return oldItem == newItem
         }
+    }
+
+    fun showColorDialog(dialogId: Int) {
+        ColorPickerDialog.newBuilder()
+                .setDialogType(ColorPickerDialog.TYPE_PRESETS)
+                .setShowAlphaSlider(false)
+                .setAllowPresets(false)
+                .setPresetsButtonText(R.string.preset)
+                .setShowColorShades(false)
+                .setAllowCustom(true)
+                .setCustomButtonText(R.string.custom)
+                .setDialogTitle(R.string.choose_color)
+                .setSelectedButtonText(R.string.ok)
+                .setDialogId(dialogId)
+                .setColor(Color.BLACK)
+                .setShowAlphaSlider(false)
+                .show(this)
+    }
+
+    override fun onDialogDismissed(dialogId: Int) {
+    }
+
+    override fun onColorSelected(dialogId: Int, color: Int) {
+        when (dialogId) {
+            123 -> { // bg_color
+                SettingDialog.sInstance?.get()?.setBgColor(color)
+            }
+            234 -> { // text_color
+                SettingDialog.sInstance?.get()?.setTextColor(color)
+            }
+        }
+
     }
 }

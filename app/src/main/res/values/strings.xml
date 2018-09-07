@@ -2,4 +2,8 @@
     <string name="app_name">Truyen Cuoi Dan Gian</string>
     <string name="toolbar_main_title">Truyện Cười Dân Gian</string>
     <string name="toolbar_content_title">Nội dung</string>
+    <string name="choose_color">Chọn màu sắc</string>
+    <string name="ok">OK</string>
+    <string name="custom">Tùy chỉnh</string>
+    <string name="preset">Mẫu màu</string>
 </resources>
