@@ -88,7 +88,6 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
                 if (story.lastView == null) {
                     story.lastView = System.currentTimeMillis()
                     updateStory(story)
-//                    StoryDB.getInstance(this)!!.StoryDao().updateStory(story)
                 }
                 val i = Intent(this, ContentActivity::class.java)
                 i.putExtra("STORY_ID", story.id)
@@ -103,7 +102,6 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
                 val story = storiesAdapter.data[position]
                 story.favorited = if (story.favorited == 1) 0 else 1
                 updateStory(story)
-//                StoryDB.getInstance(this)!!.StoryDao().updateStory(story)
             }
         }
 
@@ -114,7 +112,6 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
                 if (story.lastView == null) {
                     story.lastView = System.currentTimeMillis()
                     updateStory(story)
-//                    StoryDB.getInstance(this)!!.StoryDao().updateStory(story)
                 }
                 val i = Intent(this, ContentActivity::class.java)
                 i.putExtra("STORY_ID", story.id)
@@ -129,7 +126,6 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
                 val story = favoritedStoriesAdapter.data[position]
                 story.favorited = if (story.favorited == 1) 0 else 1
                 updateStory(story)
-//                StoryDB.getInstance(this)!!.StoryDao().updateStory(story)
             }
         }
 
