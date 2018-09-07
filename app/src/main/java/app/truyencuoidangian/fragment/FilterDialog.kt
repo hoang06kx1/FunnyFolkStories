@@ -47,7 +47,7 @@ class FilterDialog: DialogFragment() {
             if (rb_folk.isChecked) {
                 (activity as MainActivity).currentFilter = (activity as MainActivity).filterFolkStories
             }
-            StoryDB.getInstance(activity!!)!!.StoryDao().triggerReload()
+            (activity as MainActivity).triggerReload()
             dismiss()
         }
     }

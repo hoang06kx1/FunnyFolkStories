@@ -4,6 +4,7 @@ import android.arch.persistence.room.*
 import android.content.Context
 import com.fstyle.library.helper.AssetSQLiteOpenHelperFactory
 import io.reactivex.Flowable
+import io.reactivex.Single
 
 @Entity(tableName = "stories")
 data class Story(@PrimaryKey var id: Int,
@@ -23,7 +24,7 @@ data class Category(@PrimaryKey var id: Int,
 @Dao
 interface StoryDao {
     @Query("SELECT * FROM stories")
-    fun getAll(): Flowable<List<Story>>
+    fun getAll(): Single<List<Story>>
 
     @Query("SELECT * FROM stories WHERE id= :id")
     fun getStory(id: Int): Story
@@ -42,9 +43,6 @@ interface StoryDao {
 
     @Query("SELECT * from stories where category = 2")
     fun getFolkStories(): Flowable<List<Story>>
-
-    @Query("UPDATE stories SET read = RANDOM() where id = -1")
-    fun triggerReload()
 
     @Update
     fun updateStory(story: Story)

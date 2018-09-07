@@ -44,9 +44,11 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
     val filterAllStories = { t: Story -> t.id != -1 }
     val filterObsceneStories = { t: Story -> t.category == 1 && t.id != -1 }
     val filterFolkStories = { t: Story -> t.category == 2 && t.id != -1 }
+    val filterFavoriteStories = { t: Story -> t.favorited == 1 && t.id != -1 }
     var searchKey: String = ""
     var currentFilter = filterAllStories
     val watchedTimes = MutableLiveData<Int>()
+    val stories = MutableLiveData<ArrayList<Story>>()
     val WATCH_STRING = "WATCH_TIMES"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,8 +71,6 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
         tv_times.text = watchedTimes.toString()
         vp.adapter = tabAdapter
         tabs.setupWithViewPager(vp)
-        // create fake story using for trigger reload data
-        StoryDB.getInstance(this)!!.StoryDao().insertStory(Story(-1, "Faked", "Faked story", null, 1, null, null, "faked"))
         initStories()
 
         storiesAdapter.onItemClickListener = BaseQuickAdapter.OnItemClickListener { _, _, position ->
@@ -126,7 +126,7 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     searchKey = it.toString()
-                    StoryDB.getInstance(this)!!.StoryDao().triggerReload()
+                    triggerReload()
                 }
 
         ic_filter.setOnClickListener {
@@ -138,6 +138,10 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
         }
 
         loadRewardedVideoAd()
+    }
+
+    fun triggerReload() {
+        stories.value = stories.value // re-assign to trigger observable emit items
     }
 
     private fun showRewardDialog() {
@@ -159,19 +163,21 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
     }
 
     private fun initStories() {
+        stories.observe(this, Observer { stories ->
+            if (stories != null) {
+                storiesAdapter.setNewData(stories.filter(currentFilter).filter(searchFilter(searchKey)))
+                favoritedStoriesAdapter.setNewData(stories.filter(filterFavoriteStories).filter(currentFilter).filter(searchFilter(searchKey)))
+            }
+        })
+
         StoryDB.getInstance(this)!!.StoryDao().apply {
             getAll().subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .map { it.filter(currentFilter).filter(searchFilter(searchKey)) }
                     .subscribe({
-                        storiesAdapter.setNewData(it)
-                    }, Throwable::printStackTrace)
-
-            getFavoriteStories().subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .map { it.filter(currentFilter).filter(searchFilter(searchKey)) }
-                    .subscribe({
-                        favoritedStoriesAdapter.setNewData(it)
+                        // create fake story using for trigger reload data
+                        val listStories = ArrayList(it)
+                        listStories.add(Story(-1, "Faked", "Faked story", null, 1, null, null, "faked"))
+                        stories.value = ArrayList(it)
                     }, Throwable::printStackTrace)
         }
     }
