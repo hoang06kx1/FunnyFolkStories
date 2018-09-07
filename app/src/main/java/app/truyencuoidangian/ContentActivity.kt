@@ -8,6 +8,9 @@ import com.google.android.gms.ads.AdView
 import kotlinx.android.synthetic.main.activity_content.*
 import java.text.SimpleDateFormat
 import java.util.*
+import android.content.Intent
+
+
 
 class ContentActivity : AppCompatActivity() {
     var id: Int = -1
@@ -36,6 +39,13 @@ class ContentActivity : AppCompatActivity() {
             story.favorited = if (story.favorited == 1) 0 else 1
             ic_favorite.setImageResource(if (story.favorited == 1) R.drawable.ic_favorite else R.drawable.ic_favorite_grey)
             MainActivity.sInstance?.updateStory(story)
+        }
+        ic_share.setOnClickListener {
+            val shareIntent = Intent(Intent.ACTION_SEND)
+            shareIntent.type = "text/plain"
+            shareIntent.putExtra(Intent.EXTRA_TEXT, story.content)
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT, story.title)
+            startActivity(Intent.createChooser(shareIntent, "Chia sẻ truyện..."))
         }
     }
 }
