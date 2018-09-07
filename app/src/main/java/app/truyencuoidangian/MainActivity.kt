@@ -132,6 +132,7 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
         }
 
         edt_search.textChanges()
+                .skipInitialValue()
                 .debounce(400, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
@@ -182,7 +183,8 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
         stories.observe(this, Observer { stories ->
             if (stories != null) {
                 val listStories = stories.values
-                storiesAdapter.updateData(listStories.filter(currentFilter).filter(searchFilter(searchKey)))
+//                storiesAdapter.updateData(listStories.filter(currentFilter).filter(searchFilter(searchKey)))
+                storiesAdapter.updateData(listStories.toList())
                 favoritedStoriesAdapter.updateData(listStories.filter(filterFavoriteStories).filter(currentFilter).filter(searchFilter(searchKey)))
             }
         })
@@ -199,7 +201,7 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
     }
 
     private fun searchFilter(s: String): (Story) -> Boolean {
-        return { t: Story -> t.title.removeAccent().removeWhiteSpaces().contains(s.removeAccent().removeWhiteSpaces(), true) && t.id != -1 }
+        return { t: Story -> t.title.removeAccent().removeWhiteSpaces().contains(s.removeAccent().removeWhiteSpaces(), true) }
     }
 
     private inner class TabAdapter : PagerAdapter() {
@@ -315,7 +317,7 @@ class MainActivity : AppCompatActivity(), RewardedVideoAdListener {
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             val oldItem = oldList[oldItemPosition]
             val newItem = newList[newItemPosition]
-            return (oldItem.id == newItem.id) && (oldItem.favorited == newItem.favorited) && (oldItem.read == newItem.read) && (oldItem.lastView == newItem.lastView)
+            return oldItem == newItem
         }
     }
 }
